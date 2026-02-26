@@ -1,10 +1,47 @@
 # Changelog
 
-The original bash scripts of RepBox have been transformed into subprocesses within a Python framework, enhancing user interactivity and facilitating ease of utilization. By consolidating the scripts into a single Python script, each command is now invoked as a subprocess. Furthermore, the inclusion of individual parameters in each command ensures that the optimization outputs remain unaltered.
+All notable changes to this project will be documented in this file.
 
-The installation instructions for pipeline dependencies have been revised to accommodate the modified implementation of the pipeline script.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-The `setup_repbox.sh` file has been updated to align with the changes made to the pipeline and script.
+## [Unreleased]
 
-Additional packages, which may pose challenges in terms of user download or require more than the standard wget, make, or make install commands, have been incorporated for ease of accessibility.
+### Added
+- Python package scaffold under `src/repbox/` for v0.3.0 Milestone A.
+- New CLI scaffold with `run`, `check`, and `version` commands.
+- Legacy config compatibility loader for `repbox_config.txt`.
+- Initial adapter and workflow engine stubs for phased migration.
+
+### Planned
+- Environment and dependency setup improvements.
+- Baseline run revalidation and reproducibility checks.
+- Early reliability and usability improvements for active development.
+
+## [0.2.0] - 2026-02-26
+
+### Added
+- Release workflow documentation in `RELEASING.md`.
+- Reusable GitHub release note drafts in `RELEASE_NOTES_TEMPLATES.md`.
+
+### Changed
+- Updated `README.md` with project status, versioning policy, and release guidance.
+- Standardized changelog structure for ongoing semantic versioning.
+
+### Notes
+- Project reactivation milestone after an extended maintenance gap.
+- No functional pipeline code changes in this release.
+
+## [0.1.0] - 2026-02-26
+
+### Added
+- Unified Python pipeline (`main.py`) that invokes original workflow tools via subprocess.
+- Configuration-driven dependency paths using `repbox_config.txt`.
+- Included helper assets/dependencies under `included/` for easier setup.
+
+### Changed
+- Migrated original bash-driven process into a Python orchestration workflow.
+- Updated installation instructions to align with the Python-based pipeline flow.
+
+### Notes
+- This is the first formal tagged release of the thesis-era codebase.
 

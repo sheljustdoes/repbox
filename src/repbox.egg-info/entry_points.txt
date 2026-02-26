@@ -1,0 +1,2 @@
+[console_scripts]
+repbox = repbox.cli:main

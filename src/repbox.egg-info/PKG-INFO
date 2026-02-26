@@ -1,3 +1,10 @@
+Metadata-Version: 2.4
+Name: repbox
+Version: 0.3.0.dev0
+Summary: RepBox Python-first pipeline scaffold
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+
 # RepBox
 
 RepBox is a transposable element discovery and annotation workflow created during PhD thesis research.
@@ -12,7 +19,6 @@ RepBox is a transposable element discovery and annotation workflow created durin
 - Release procedure: `RELEASING.md`.
 - GitHub release note drafts: `RELEASE_NOTES_TEMPLATES.md`.
 - Engineering plan for next iteration: `IMPLEMENTATION_SPEC_V0.3.0.md`.
-- GitHub planning/project setup guide: `GITHUB_PROJECT_PLAYBOOK.md`.
 
 Suggested release usage:
 - `0.x.y` while APIs/workflow behavior are still being stabilized.
