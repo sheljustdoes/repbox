@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - New CLI scaffold with `run`, `check`, and `version` commands.
 - New CLI `smoke` command for lightweight environment/input validation and report output.
 - New CLI `smoke-report` command to summarize and evaluate `smoke_report.txt` files.
+- New legacy setup reference doc: `docs/legacy/thesis_environment_setup.md`.
 - Legacy config compatibility loader for `repbox_config.txt`.
 - Initial adapter and workflow engine stubs for phased migration.
 - Shared adapter command runner (`run_command`) with timeout and structured results.
@@ -25,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `repbox smoke` now writes `schema_version=1`, and `repbox smoke-report` validates schema compatibility.
 - Version metadata now targets `2.0.0-dev` / `2.0.0.dev0` for release preparation.
 - README versioning and command coverage notes now reflect current scaffold state.
+- README was overhauled for modern onboarding, CLI usage, and research roadmap clarity.
 
 ### Planned
 - Environment and dependency setup improvements.
