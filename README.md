@@ -21,10 +21,10 @@ Notes:
 
 ## Project documentation map
 - Changelog: `Changelog.md`
-- Release workflow: `RELEASING.md`
-- Release notes templates: `RELEASE_NOTES_TEMPLATES.md`
+- Release workflow: `docs/process/releasing.md`
+- Release notes templates: `docs/process/release_notes_templates.md`
 - v0.3.0 implementation spec: `IMPLEMENTATION_SPEC_V0.3.0.md`
-- GitHub Projects playbook: `GITHUB_PROJECT_PLAYBOOK.md`
+- GitHub Projects playbook: `docs/process/github_project_playbook.md`
 
 ## Versioning model
 - Semantic Versioning (`MAJOR.MINOR.PATCH`).

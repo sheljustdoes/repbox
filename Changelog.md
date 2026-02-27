@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - New CLI scaffold with `run`, `check`, and `version` commands.
 - Legacy config compatibility loader for `repbox_config.txt`.
 - Initial adapter and workflow engine stubs for phased migration.
+- Shared adapter command runner (`run_command`) with timeout and structured results.
 
 ### Planned
 - Environment and dependency setup improvements.
@@ -20,8 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [0.2.0] - 2026-02-26
 
 ### Added
-- Release workflow documentation in `RELEASING.md`.
-- Reusable GitHub release note drafts in `RELEASE_NOTES_TEMPLATES.md`.
+- Release workflow documentation in `docs/process/releasing.md`.
+- Reusable GitHub release note drafts in `docs/process/release_notes_templates.md`.
 
 ### Changed
 - Updated `README.md` with project status, versioning policy, and release guidance.
