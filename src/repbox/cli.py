@@ -45,6 +45,16 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Path to legacy RepBox config file",
     )
 
+    smoke_report_parser = subparsers.add_parser(
+        "smoke-report",
+        help="Read and summarize a smoke report file",
+    )
+    smoke_report_parser.add_argument(
+        "--report",
+        required=True,
+        help="Path to smoke_report.txt",
+    )
+
     subparsers.add_parser("version", help="Print RepBox version")
     return parser
 
@@ -280,6 +290,47 @@ def _cmd_smoke(args: argparse.Namespace) -> int:
     return 0
 
 
+def _parse_smoke_report(report_path: Path) -> dict[str, str]:
+    parsed: dict[str, str] = {}
+    for raw_line in report_path.read_text(encoding="utf-8").splitlines():
+        if not raw_line.strip() or "=" not in raw_line:
+            continue
+        key, value = raw_line.split("=", 1)
+        parsed[key.strip()] = value.strip()
+    return parsed
+
+
+def _cmd_smoke_report(args: argparse.Namespace) -> int:
+    logger = setup_logging(args.log_level)
+    report_path = Path(args.report)
+
+    if not report_path.exists():
+        logger.error("Smoke report not found: %s", report_path)
+        return 2
+
+    data = _parse_smoke_report(report_path)
+    if "tools_total" not in data or "tools_failing" not in data:
+        logger.error("Smoke report is malformed: missing required fields")
+        return 1
+
+    tools_total = data.get("tools_total", "?")
+    tools_failing = data.get("tools_failing", "?")
+    failing_tools = data.get("failing_tools", "-")
+
+    logger.info("Smoke report summary")
+    logger.info("  report: %s", report_path)
+    logger.info("  tools_total: %s", tools_total)
+    logger.info("  tools_failing: %s", tools_failing)
+    logger.info("  failing_tools: %s", failing_tools)
+
+    if tools_failing != "0":
+        logger.warning("Smoke report indicates tool failures.")
+        return 1
+
+    logger.info("Smoke report indicates a passing environment.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
@@ -290,6 +341,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_check(args)
     if args.command == "smoke":
         return _cmd_smoke(args)
+    if args.command == "smoke-report":
+        return _cmd_smoke_report(args)
     if args.command == "version":
         print(__version__)
         return 0
