@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Python package scaffold under `src/repbox/` for v0.3.0 Milestone A.
 - New CLI scaffold with `run`, `check`, and `version` commands.
 - New CLI `smoke` command for lightweight environment/input validation and report output.
+- New CLI `smoke-report` command to summarize and evaluate `smoke_report.txt` files.
 - Legacy config compatibility loader for `repbox_config.txt`.
 - Initial adapter and workflow engine stubs for phased migration.
 - Shared adapter command runner (`run_command`) with timeout and structured results.

@@ -295,6 +295,50 @@ class CliTests(unittest.TestCase):
             self.assertIn("RepeatModeler.status=MISSING", report)
             self.assertIn("BuildDatabase.status=MISSING", report)
 
+    def test_smoke_report_returns_error_when_file_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            missing = Path(tmpdir) / "smoke_report.txt"
+            rc = main(["smoke-report", "--report", str(missing)])
+        self.assertEqual(rc, 2)
+
+    def test_smoke_report_parses_passing_report(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "smoke_report.txt"
+            report_path.write_text(
+                "\n".join(
+                    [
+                        "input=/tmp/in.fa",
+                        "output=/tmp/out",
+                        "tools_total=8",
+                        "tools_failing=0",
+                        "failing_tools=-",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            rc = main(["smoke-report", "--report", str(report_path)])
+        self.assertEqual(rc, 0)
+
+    def test_smoke_report_parses_failing_report(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "smoke_report.txt"
+            report_path.write_text(
+                "\n".join(
+                    [
+                        "input=/tmp/in.fa",
+                        "output=/tmp/out",
+                        "tools_total=8",
+                        "tools_failing=2",
+                        "failing_tools=RepeatModeler,BuildDatabase",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            rc = main(["smoke-report", "--report", str(report_path)])
+        self.assertEqual(rc, 1)
+
 
 if __name__ == "__main__":
     unittest.main()
