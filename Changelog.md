@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Planned
+- Environment and dependency setup improvements.
+- Baseline run revalidation and reproducibility checks.
+- Early reliability and usability improvements for active development.
+
+## [2.0.0] - 2026-02-27
+
 ### Added
 - Python package scaffold under `src/repbox/` for v0.3.0 Milestone A.
 - New CLI scaffold with `run`, `check`, and `version` commands.
@@ -24,14 +31,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `repbox run` and `repbox smoke` now emit actionable tool diagnostics (failing tool names, paths, and hints).
 - `repbox smoke-report` now supports `--json` output for machine-readable summaries.
 - `repbox smoke` now writes `schema_version=1`, and `repbox smoke-report` validates schema compatibility.
-- Version metadata now targets `2.0.0-dev` / `2.0.0.dev0` for release preparation.
+- Version metadata now targets stable `2.0.0`.
 - README versioning and command coverage notes now reflect current scaffold state.
 - README was overhauled for modern onboarding, CLI usage, and research roadmap clarity.
-
-### Planned
-- Environment and dependency setup improvements.
-- Baseline run revalidation and reproducibility checks.
-- Early reliability and usability improvements for active development.
 
 ## [0.2.0] - 2026-02-26
 
