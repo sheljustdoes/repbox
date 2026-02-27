@@ -23,6 +23,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `repbox run` and `repbox smoke` now emit actionable tool diagnostics (failing tool names, paths, and hints).
 - `repbox smoke-report` now supports `--json` output for machine-readable summaries.
 - `repbox smoke` now writes `schema_version=1`, and `repbox smoke-report` validates schema compatibility.
+- Version metadata now targets `2.0.0-dev` / `2.0.0.dev0` for release preparation.
+- README versioning and command coverage notes now reflect current scaffold state.
 
 ### Planned
 - Environment and dependency setup improvements.

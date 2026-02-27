@@ -23,13 +23,13 @@ Notes:
 - Changelog: `Changelog.md`
 - Release workflow: `docs/process/releasing.md`
 - Release notes templates: `docs/process/release_notes_templates.md`
-- v0.3.0 implementation spec: `IMPLEMENTATION_SPEC_V0.3.0.md`
+- Legacy v0.3.0 implementation spec: `IMPLEMENTATION_SPEC_V0.3.0.md`
 - GitHub Projects playbook: `docs/process/github_project_playbook.md`
 
 ## Versioning model
 - Semantic Versioning (`MAJOR.MINOR.PATCH`).
-- `0.x.y` is used while architecture and interfaces are still stabilizing.
-- `1.0.0` will be cut when CLI behavior and configuration schema are declared stable.
+- `v2.0.0` is the current release-preparation target for the modernized Python CLI scaffold.
+- Ongoing branch work continues through small, reviewable feature slices merged into `master`.
 
 ## Development workflow
 1. Create a focused branch per task (`feat/*`, `fix/*`, `docs/*`, `test/*`).
@@ -37,9 +37,9 @@ Notes:
 3. Update `Changelog.md` (`Unreleased`) for user-visible changes.
 4. Merge only when local validation and docs updates are complete.
 
-## v0.3.0 Milestone A scaffold
+## Current scaffold status
 - New package scaffold under `src/repbox/`.
-- New Python CLI scaffold with commands: `run`, `check`, `version`.
+- New Python CLI scaffold with commands: `run`, `check`, `smoke`, `smoke-report`, `version`.
 - Legacy tool-path compatibility loader for `repbox_config.txt`.
 - Initial adapter and workflow-engine stubs for phased migration.
 
