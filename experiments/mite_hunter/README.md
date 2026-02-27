@@ -36,6 +36,51 @@ This workspace is for isolated experimentation with MITE-Hunter as a candidate r
 3. Log parameters/metrics/artifact pointers from each run.
 4. Keep the markdown run logs as the canonical decision record in git.
 
+## Required tracking schema
+
+### Parameters
+- `tool_name`
+- `tool_version`
+- `dataset_id`
+- `config_hash`
+- `threads`
+- `memory_limit`
+- `timeout`
+- `policy_matrix_row`
+
+### Metrics
+- `wall_clock_seconds`
+- `peak_memory_mb`
+- `num_elements_found`
+- `num_families`
+- `overlap_with_annotation`
+- `precision_recall_if_annotated`
+- `exit_code`
+
+### Artifacts
+- `raw_output`
+- `processed_bed_gff`
+- `summary_stats`
+- `stdout_stderr_logs`
+
+The runner script writes these fields to `run_metrics.json` and `artifacts_manifest.txt`.
+
+## Small annotated genome shortlist (local benchmarking)
+
+Use one tiny smoke dataset and one small annotated real dataset per decision cycle.
+
+1. **Recommended first real benchmark: Arabidopsis thaliana TAIR10 chromosome 4**
+	- Why: small chromosome scale, strong plant relevance, widely used annotation ecosystem.
+	- Typical use: first MITE-Hunter local benchmark for reproducible laptop runs.
+
+2. **Arabidopsis thaliana TAIR10 chromosome 1**
+	- Why: still laptop-manageable, larger than chr4 for moderate stress testing.
+
+3. **Oryza sativa (rice) single chromosome slice**
+	- Why: crop genome relevance with rich transposon literature; use one chromosome/slice to keep compute bounded.
+
+Dataset selection rule: prefer inputs with public annotation tracks that support overlap and precision/recall-style checks.
+
 ## Branching
 Use this branch for experimentation:
 - `exp/mite-hunter-eval`
