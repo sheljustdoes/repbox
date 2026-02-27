@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 from . import __version__
@@ -53,6 +54,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "--report",
         required=True,
         help="Path to smoke_report.txt",
+    )
+    smoke_report_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print machine-readable JSON summary",
     )
 
     subparsers.add_parser("version", help="Print RepBox version")
@@ -305,17 +311,49 @@ def _cmd_smoke_report(args: argparse.Namespace) -> int:
     report_path = Path(args.report)
 
     if not report_path.exists():
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "report": str(report_path),
+                        "error": "not_found",
+                    }
+                )
+            )
         logger.error("Smoke report not found: %s", report_path)
         return 2
 
     data = _parse_smoke_report(report_path)
     if "tools_total" not in data or "tools_failing" not in data:
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "report": str(report_path),
+                        "error": "malformed",
+                    }
+                )
+            )
         logger.error("Smoke report is malformed: missing required fields")
         return 1
 
     tools_total = data.get("tools_total", "?")
     tools_failing = data.get("tools_failing", "?")
     failing_tools = data.get("failing_tools", "-")
+    failing_count = int(tools_failing) if tools_failing.isdigit() else -1
+
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "report": str(report_path),
+                    "tools_total": int(tools_total) if tools_total.isdigit() else tools_total,
+                    "tools_failing": failing_count,
+                    "failing_tools": [] if failing_tools == "-" else failing_tools.split(","),
+                    "status": "pass" if failing_count == 0 else "fail",
+                }
+            )
+        )
 
     logger.info("Smoke report summary")
     logger.info("  report: %s", report_path)
