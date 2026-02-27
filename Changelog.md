@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Legacy config compatibility loader for `repbox_config.txt`.
 - Initial adapter and workflow engine stubs for phased migration.
 - Shared adapter command runner (`run_command`) with timeout and structured results.
+- Concrete `RepeatModelerAdapter` with BuildDatabase + RepeatModeler command construction and execution.
+
+### Changed
+- `repbox run` now executes the RepeatModeler adapter path (Milestone B foundation behavior).
 
 ### Planned
 - Environment and dependency setup improvements.
