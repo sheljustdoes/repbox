@@ -14,7 +14,7 @@ Add these custom fields in the project:
 - `Priority` (single select): P0, P1, P2
 - `Size` (single select): XS, S, M, L, XL
 - `Area` (single select): CLI, Config, Adapters, Workflow, MITE, SINE, Docs, Tests
-- `Target Release` (text): e.g. v0.4.0
+- `Target Release` (text): e.g. v1.1.0
 - `Start Date` (date)
 - `Due Date` (date)
 

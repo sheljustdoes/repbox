@@ -14,6 +14,8 @@ From repository root:
 2. `python -m repbox version`
 3. `python -m repbox check --legacy-config repbox_config.txt`
 4. `python -m repbox run --input <genome.fa> --out <output_dir> --threads 4`
+5. `python -m repbox fallback-scan --input <genome.fa> --out <fallback_dir> --classes mite,sine,helitron`
+6. `python -m repbox refine-families --input-dir <fallback_dir> --out <refined_dir> --classes mite,sine`
 
 Notes:
 - `repbox check` returning non-zero is expected if legacy tool paths are missing on your machine.
@@ -21,15 +23,18 @@ Notes:
 
 ## Project documentation map
 - Changelog: `Changelog.md`
-- Release workflow: `docs/process/releasing.md`
-- Release notes templates: `docs/process/release_notes_templates.md`
-- v0.3.0 implementation spec: `IMPLEMENTATION_SPEC_V0.3.0.md`
+- Release workflow (includes templates + active schedule): `docs/process/releasing.md`
+- Unified implementation plan (primary): `IMPLEMENTATION_PLAN_UNIFIED.md`
+- TE tooling landscape update (2022-2026): `literature review/te_tooling_landscape_2026.md`
 - GitHub Projects playbook: `docs/process/github_project_playbook.md`
 
 ## Versioning model
 - Semantic Versioning (`MAJOR.MINOR.PATCH`).
-- `0.x.y` is used while architecture and interfaces are still stabilizing.
-- `1.0.0` will be cut when CLI behavior and configuration schema are declared stable.
+- Latest live release: `v1.2.0`.
+- Completed release sequence under current convention: `v1.1.0` -> `v1.1.1` -> `v1.2.0`.
+- Active maintenance line: `1.2.x` (stabilization/patches as needed).
+- Next feature line: `1.3.x` (to be scoped after `v1.2.x` stabilization).
+- `2.0.0` is the functional milestone release target: RepBox end-to-end pipeline is production-usable and primarily driven by novel in-project element-identification methods (with external whole-genome pipelines retained as comparison baselines).
 
 ## Development workflow
 1. Create a focused branch per task (`feat/*`, `fix/*`, `docs/*`, `test/*`).
@@ -37,15 +42,42 @@ Notes:
 3. Update `Changelog.md` (`Unreleased`) for user-visible changes.
 4. Merge only when local validation and docs updates are complete.
 
-## v0.3.0 Milestone A scaffold
+## Historical Milestone A scaffold (pre-v1.0.3)
 - New package scaffold under `src/repbox/`.
 - New Python CLI scaffold with commands: `run`, `check`, `version`.
 - Legacy tool-path compatibility loader for `repbox_config.txt`.
 - Initial adapter and workflow-engine stubs for phased migration.
 
-## Legacy dependency installation reference
-The remaining sections below document the original dependency setup used for the thesis-era pipeline.
-They are preserved for reproducibility and migration support.
+## RepeatModeler compatibility (historical modernization phase)
+`repbox run` now uses a compatibility probe for RepeatModeler threading flags:
+
+| RepeatModeler line | Thread flag used by RepBox | Compatibility mode |
+|---|---|---|
+| `2.0.4+` (modern) | `-threads` | `modern-threads` |
+| `2.0.1-2.0.3` (legacy) | `-pa` | `legacy-pa` |
+
+RepBox detects support from RepeatModeler help/version output. If detection fails, `repbox run` exits early with a targeted error and `repbox check` marks the tool as incompatible.
+
+## Historical prototype: nested-aware graph refinement (SINE/MITE/Helitron)
+RepBox includes an experimental Python refinement stage that clusters candidate insertions into families using k-mer similarity graphs and labels fully nested insertions.
+
+Command:
+- `repbox refine-families --input-dir <fallback_dir> --out <refined_dir> --classes mite,sine`
+
+Outputs:
+- `refined_families.tsv`
+- `refined_members.tsv` (includes `nested` and `nested_round` labels)
+- `refined_library.fa` (family representatives)
+- `refined_summary.json`
+
+## Platform notes (macOS Intel + ARM)
+- Prefer architecture-matching binaries when using precompiled dependencies (`x86_64` vs `arm64`).
+- Some legacy dependencies were historically installed via Intel-only binaries; on Apple Silicon these may require source builds or Rosetta-based compatibility workflows.
+- `repbox check` validates configured paths and executability, but does not install tools.
+
+## Historical thesis-era dependency reference
+The remaining sections below document the original dependency setup used during thesis-era development.
+They are preserved for reproducibility and migration support, not as the default modern installation guidance.
 
 # Create Home directory for repbox
 ```
@@ -190,7 +222,7 @@ brew install local_homebrew_formulas/dos2unix.rb
 
 ```
 
-## RepeatModeler 2.0.1
+## RepeatModeler 2.0.1 (historical pin)
 ```
 cd $HOME/repbox/bin
 wget https://github.com/Dfam-consortium/RepeatModeler/archive/refs/tags/2.0.1.tar.gz
@@ -198,7 +230,7 @@ tar -zxvf 2.0.1.tar.gz
 cd RepeatModeler-2.0.1/
 ```
 
-## RepeatMasker 4.1.3.p1
+## RepeatMasker 4.1.3.p1 (historical pin)
 ```
 cd $HOME/repbox/bin
 wget https://www.repeatmasker.org/RepeatMasker/RepeatMasker-4.1.3-p1.tar.gz

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from .base import ExternalToolAdapter
+from .repeatmodeler import RepeatModelerAdapter
 
 
 def default_adapters() -> list[ExternalToolAdapter]:
     return [
-        ExternalToolAdapter(name="RepeatModeler", config_key="RepeatModeler"),
+        RepeatModelerAdapter(),
         ExternalToolAdapter(name="RepeatMasker", config_key="RepeatMasker"),
         ExternalToolAdapter(name="RepeatClassifier", config_key="RepeatClassifier"),
         ExternalToolAdapter(name="BuildDatabase", config_key="BuildDatabase"),
