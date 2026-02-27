@@ -126,6 +126,54 @@ class CliTests(unittest.TestCase):
                 )
         self.assertEqual(rc, 7)
 
+    def test_run_skips_repeatmasker_when_not_configured(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            input_fa = tmp / "genome.fa"
+            input_fa.write_text(">x\nACGT\n", encoding="utf-8")
+            exe = tmp / "tool"
+            _make_executable(exe)
+            config_path = tmp / "repbox_config.txt"
+            _write_legacy_config(
+                config_path,
+                {"RepeatModeler": str(exe), "BuildDatabase": str(exe)},
+            )
+
+            with mock.patch(
+                "repbox.adapters.repeatmodeler.RepeatModelerAdapter.detect_thread_flag",
+                return_value="-threads",
+            ), mock.patch(
+                "repbox.adapters.repeatmodeler.RepeatModelerAdapter.run_pipeline",
+                return_value=RepeatModelerRunResult(
+                    build_database=CommandResult(
+                        command=["BuildDatabase"],
+                        returncode=0,
+                        stdout="",
+                        stderr="",
+                        duration_seconds=0.1,
+                    ),
+                    repeatmodeler=CommandResult(
+                        command=["RepeatModeler"],
+                        returncode=0,
+                        stdout="ok",
+                        stderr="",
+                        duration_seconds=0.2,
+                    ),
+                ),
+            ):
+                rc = main(
+                    [
+                        "run",
+                        "--input",
+                        str(input_fa),
+                        "--out",
+                        str(tmp / "out"),
+                        "--legacy-config",
+                        str(config_path),
+                    ]
+                )
+        self.assertEqual(rc, 0)
+
 
 if __name__ == "__main__":
     unittest.main()
