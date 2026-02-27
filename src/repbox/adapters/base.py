@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from pathlib import Path
 from typing import Mapping
 
@@ -12,6 +13,10 @@ class AdapterCheckResult:
     name: str
     configured_path: str
     exists: bool
+    is_executable: bool = False
+    version: str = ""
+    compatibility_mode: str = ""
+    hint: str = ""
 
 
 @dataclass
@@ -21,10 +26,23 @@ class ExternalToolAdapter:
 
     def check_installation(self, tools: dict[str, str]) -> AdapterCheckResult:
         configured = tools.get(self.config_key, "")
+        exists = bool(configured and Path(configured).exists())
+        is_executable = bool(exists and os.access(configured, os.X_OK))
+
+        hint = ""
+        if not configured:
+            hint = f"Set '{self.config_key}' in repbox_config.txt."
+        elif not exists:
+            hint = "Configured path does not exist."
+        elif not is_executable:
+            hint = "Configured path is not executable."
+
         return AdapterCheckResult(
             name=self.name,
             configured_path=configured,
-            exists=bool(configured and Path(configured).exists()),
+            exists=exists,
+            is_executable=is_executable,
+            hint=hint,
         )
 
     def build_command(self, tools: dict[str, str], args: list[str]) -> list[str]:
