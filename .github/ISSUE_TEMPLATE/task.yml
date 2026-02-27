@@ -1,0 +1,47 @@
+name: Task
+description: Track a scoped engineering task
+title: "task: "
+labels:
+  - task
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What is the intended outcome?
+    validations:
+      required: true
+
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist
+      placeholder: |
+        - [ ] Implementation
+        - [ ] Docs updated
+        - [ ] Changelog updated
+        - [ ] Validation run
+    validations:
+      required: true
+
+  - type: input
+    id: release
+    attributes:
+      label: Target release
+      placeholder: v0.4.0
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI
+        - Config
+        - Adapters
+        - Workflow Engine
+        - TE Module (MITE)
+        - TE Module (SINE)
+        - Docs
+        - Tests
+    validations:
+      required: true

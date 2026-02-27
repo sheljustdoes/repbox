@@ -1,0 +1,75 @@
+name: Feature
+description: Propose a scoped feature for RepBox modernization
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What are we building and why?
+      placeholder: Add a concise feature summary.
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What pain point does this solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: In-scope and out-of-scope for this issue.
+      placeholder: |
+        In scope:
+        -
+        Out of scope:
+        -
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What must be true to consider this done?
+      placeholder: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI
+        - Config
+        - Adapters
+        - Workflow Engine
+        - TE Module (MITE)
+        - TE Module (SINE)
+        - Docs
+        - Tests
+    validations:
+      required: true
+
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Estimated size
+      options:
+        - XS (<2h)
+        - S (half day)
+        - M (1 day)
+        - L (2-3 days)
+        - XL (>3 days)
+    validations:
+      required: true

@@ -1,3 +1,51 @@
+# RepBox
+
+RepBox is a transposable element discovery and annotation workflow created during PhD thesis research.
+
+## Overview
+- Legacy thesis-era pipeline with active modernization in progress.
+- Current modernization track: Python-first architecture and modular adapters.
+- Development planning is managed in GitHub Projects (Kanban workflow).
+
+## Quick start (development scaffold)
+From repository root:
+
+1. `python -m pip install -e .`
+2. `python -m repbox version`
+3. `python -m repbox check --legacy-config repbox_config.txt`
+4. `python -m repbox run --input <genome.fa> --out <output_dir> --threads 4`
+
+Notes:
+- `repbox check` returning non-zero is expected if legacy tool paths are missing on your machine.
+- The new CLI currently provides Milestone A scaffold behavior while migration continues.
+
+## Project documentation map
+- Changelog: `Changelog.md`
+- Release workflow: `RELEASING.md`
+- Release notes templates: `RELEASE_NOTES_TEMPLATES.md`
+- v0.3.0 implementation spec: `IMPLEMENTATION_SPEC_V0.3.0.md`
+- GitHub Projects playbook: `GITHUB_PROJECT_PLAYBOOK.md`
+
+## Versioning model
+- Semantic Versioning (`MAJOR.MINOR.PATCH`).
+- `0.x.y` is used while architecture and interfaces are still stabilizing.
+- `1.0.0` will be cut when CLI behavior and configuration schema are declared stable.
+
+## Development workflow
+1. Create a focused branch per task (`feat/*`, `fix/*`, `docs/*`, `test/*`).
+2. Open a pull request into `master`.
+3. Update `Changelog.md` (`Unreleased`) for user-visible changes.
+4. Merge only when local validation and docs updates are complete.
+
+## v0.3.0 Milestone A scaffold
+- New package scaffold under `src/repbox/`.
+- New Python CLI scaffold with commands: `run`, `check`, `version`.
+- Legacy tool-path compatibility loader for `repbox_config.txt`.
+- Initial adapter and workflow-engine stubs for phased migration.
+
+## Legacy dependency installation reference
+The remaining sections below document the original dependency setup used for the thesis-era pipeline.
+They are preserved for reproducibility and migration support.
 
 # Create Home directory for repbox
 ```
