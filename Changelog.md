@@ -13,9 +13,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial adapter and workflow engine stubs for phased migration.
 - Shared adapter command runner (`run_command`) with timeout and structured results.
 - Concrete `RepeatModelerAdapter` with BuildDatabase + RepeatModeler command construction and execution.
+- Concrete `RepeatMaskerAdapter` with command construction and execution support.
 
 ### Changed
 - `repbox run` now executes the RepeatModeler adapter path (Milestone B foundation behavior).
+- `repbox run` now performs an optional RepeatMasker step after successful RepeatModeler execution when configured.
 
 ### Planned
 - Environment and dependency setup improvements.

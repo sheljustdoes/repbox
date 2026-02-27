@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 from . import __version__
-from .adapters import RepeatModelerAdapter, default_adapters
+from .adapters import RepeatMaskerAdapter, RepeatModelerAdapter, default_adapters
 from .config import build_app_config
 from .logging import setup_logging
 
@@ -126,6 +126,40 @@ def _cmd_run(args: argparse.Namespace) -> int:
         return run_result.repeatmodeler.returncode
 
     logger.info("RepeatModeler pipeline step completed successfully.")
+
+    repeatmasker_adapter = RepeatMaskerAdapter()
+    repeatmasker_check = repeatmasker_adapter.check_installation(config.tools)
+    if not repeatmasker_check.exists:
+        logger.info("RepeatMasker not configured/found; skipping masking step.")
+        return 0
+    if not repeatmasker_check.is_executable:
+        logger.warning("RepeatMasker configured but not executable; skipping masking step.")
+        return 0
+
+    logger.info("Running optional RepeatMasker step.")
+    try:
+        rm_result = repeatmasker_adapter.run_pipeline(
+            tools=config.tools,
+            genome_fasta=input_path,
+            output_dir=output_path,
+            threads=args.threads,
+            engine=args.engine,
+            timeout_seconds=float(config.runtime.timeout_seconds),
+        )
+    except ValueError as exc:
+        logger.error(str(exc))
+        return 1
+    except Exception as exc:
+        logger.error("RepeatMasker execution failed: %s", exc)
+        return 1
+
+    if rm_result.repeatmasker.returncode != 0:
+        logger.error("RepeatMasker failed (exit=%d)", rm_result.repeatmasker.returncode)
+        if rm_result.repeatmasker.stderr:
+            logger.error(rm_result.repeatmasker.stderr.strip())
+        return rm_result.repeatmasker.returncode
+
+    logger.info("RepeatMasker step completed successfully.")
     return 0
 
 
