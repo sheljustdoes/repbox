@@ -34,6 +34,18 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Path to legacy RepBox config file",
     )
 
+    smoke_parser = subparsers.add_parser(
+        "smoke",
+        help="Run lightweight environment/input smoke checks",
+    )
+    smoke_parser.add_argument("--input", required=True, help="Input genome FASTA")
+    smoke_parser.add_argument("--out", required=True, help="Output directory")
+    smoke_parser.add_argument(
+        "--legacy-config",
+        default="repbox_config.txt",
+        help="Path to legacy RepBox config file",
+    )
+
     subparsers.add_parser("version", help="Print RepBox version")
     return parser
 
@@ -208,6 +220,44 @@ def _cmd_check(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_smoke(args: argparse.Namespace) -> int:
+    logger = setup_logging(args.log_level)
+    config = build_app_config(legacy_config_path=args.legacy_config)
+
+    input_path = Path(args.input)
+    output_path = Path(args.out)
+
+    if not input_path.exists():
+        logger.error("Input FASTA not found: %s", input_path)
+        return 2
+
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    results = [adapter.check_installation(config.tools) for adapter in default_adapters()]
+    failing = [
+        result
+        for result in results
+        if (not result.exists) or (not result.is_executable) or (result.compatibility_mode == "unsupported")
+    ]
+
+    report_path = output_path / "smoke_report.txt"
+    report_lines = [
+        f"input={input_path}",
+        f"output={output_path}",
+        f"tools_total={len(results)}",
+        f"tools_failing={len(failing)}",
+    ]
+    report_path.write_text("\n".join(report_lines) + "\n", encoding="utf-8")
+    logger.info("Smoke report written: %s", report_path)
+
+    if failing:
+        logger.warning("Smoke check found %d tool issue(s).", len(failing))
+        return 1
+
+    logger.info("Smoke check passed.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
@@ -216,6 +266,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_run(args)
     if args.command == "check":
         return _cmd_check(args)
+    if args.command == "smoke":
+        return _cmd_smoke(args)
     if args.command == "version":
         print(__version__)
         return 0

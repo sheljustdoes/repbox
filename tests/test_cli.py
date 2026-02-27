@@ -174,6 +174,74 @@ class CliTests(unittest.TestCase):
                 )
         self.assertEqual(rc, 0)
 
+        self.assertEqual(rc, 0)
+
+    def test_smoke_fails_when_input_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            config_path = tmp / "repbox_config.txt"
+            _write_legacy_config(config_path, {})
+
+            rc = main(
+                [
+                    "smoke",
+                    "--input",
+                    str(tmp / "missing.fa"),
+                    "--out",
+                    str(tmp / "out"),
+                    "--legacy-config",
+                    str(config_path),
+                ]
+            )
+
+        self.assertEqual(rc, 2)
+
+    def test_smoke_writes_report_and_passes_when_tools_ok(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            input_fa = tmp / "genome.fa"
+            input_fa.write_text(">x\nACGT\n", encoding="utf-8")
+            exe = tmp / "tool"
+            _make_executable(exe)
+            config_path = tmp / "repbox_config.txt"
+            _write_legacy_config(
+                config_path,
+                {
+                    "RepeatModeler": str(exe),
+                    "RepeatMasker": str(exe),
+                    "RepeatClassifier": str(exe),
+                    "BuildDatabase": str(exe),
+                    "SineScan": str(exe),
+                    "miteFinder": str(exe),
+                    "HelitronScanner": str(exe),
+                    "VSEARCH": str(exe),
+                },
+            )
+
+            with mock.patch(
+                "repbox.adapters.repeatmodeler.RepeatModelerAdapter.probe_thread_flag",
+                return_value=ThreadFlagProbeResult(thread_flag="-threads", version="2.0.7"),
+            ):
+                out_dir = tmp / "out"
+                rc = main(
+                    [
+                        "smoke",
+                        "--input",
+                        str(input_fa),
+                        "--out",
+                        str(out_dir),
+                        "--legacy-config",
+                        str(config_path),
+                    ]
+                )
+
+            self.assertEqual(rc, 0)
+            report_path = out_dir / "smoke_report.txt"
+            self.assertTrue(report_path.exists())
+            report = report_path.read_text(encoding="utf-8")
+            self.assertIn("tools_total=8", report)
+            self.assertIn("tools_failing=0", report)
+
 
 if __name__ == "__main__":
     unittest.main()
