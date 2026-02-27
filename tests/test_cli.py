@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+import io
+from contextlib import redirect_stdout
 from pathlib import Path
 import tempfile
 import unittest
@@ -338,6 +341,60 @@ class CliTests(unittest.TestCase):
             )
             rc = main(["smoke-report", "--report", str(report_path)])
         self.assertEqual(rc, 1)
+
+    def test_smoke_report_json_pass_output(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "smoke_report.txt"
+            report_path.write_text(
+                "\n".join(
+                    [
+                        "input=/tmp/in.fa",
+                        "output=/tmp/out",
+                        "tools_total=8",
+                        "tools_failing=0",
+                        "failing_tools=-",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            stream = io.StringIO()
+            with redirect_stdout(stream):
+                rc = main(["smoke-report", "--report", str(report_path), "--json"])
+
+        self.assertEqual(rc, 0)
+        payload = json.loads(stream.getvalue().strip())
+        self.assertEqual(payload["status"], "pass")
+        self.assertEqual(payload["tools_failing"], 0)
+        self.assertEqual(payload["failing_tools"], [])
+
+    def test_smoke_report_json_fail_output(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "smoke_report.txt"
+            report_path.write_text(
+                "\n".join(
+                    [
+                        "input=/tmp/in.fa",
+                        "output=/tmp/out",
+                        "tools_total=8",
+                        "tools_failing=2",
+                        "failing_tools=RepeatModeler,BuildDatabase",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            stream = io.StringIO()
+            with redirect_stdout(stream):
+                rc = main(["smoke-report", "--report", str(report_path), "--json"])
+
+        self.assertEqual(rc, 1)
+        payload = json.loads(stream.getvalue().strip())
+        self.assertEqual(payload["status"], "fail")
+        self.assertEqual(payload["tools_failing"], 2)
+        self.assertEqual(payload["failing_tools"], ["RepeatModeler", "BuildDatabase"])
 
 
 if __name__ == "__main__":
