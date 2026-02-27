@@ -2,27 +2,40 @@
 
 RepBox is a transposable element discovery and annotation workflow created during PhD thesis research.
 
-## Project status
-- Legacy research codebase, now moving into maintained open-source development.
-- First formal versioned release target: `v0.1.0`.
+## Overview
+- Legacy thesis-era pipeline with active modernization in progress.
+- Current modernization track: Python-first architecture and modular adapters.
+- Development planning is managed in GitHub Projects (Kanban workflow).
 
-## Versioning and releases
-- Versioning model: Semantic Versioning (`MAJOR.MINOR.PATCH`).
-- Changelog source of truth: `Changelog.md`.
-- Release procedure: `RELEASING.md`.
-- GitHub release note drafts: `RELEASE_NOTES_TEMPLATES.md`.
-- Engineering plan for next iteration: `IMPLEMENTATION_SPEC_V0.3.0.md`.
-- GitHub planning/project setup guide: `GITHUB_PROJECT_PLAYBOOK.md`.
+## Quick start (development scaffold)
+From repository root:
 
-Suggested release usage:
-- `0.x.y` while APIs/workflow behavior are still being stabilized.
-- `1.0.0` when CLI behavior and configuration schema are declared stable.
+1. `python -m pip install -e .`
+2. `python -m repbox version`
+3. `python -m repbox check --legacy-config repbox_config.txt`
+4. `python -m repbox run --input <genome.fa> --out <output_dir> --threads 4`
 
-## Restarting active development
-1. Create a branch for each change (for example: `feat/<name>` or `fix/<name>`).
-2. Record user-visible changes under `## [Unreleased]` in `Changelog.md`.
-3. Validate pipeline execution on at least one known input before merging.
-4. Tag releases from `main` using annotated tags (for example: `v0.1.1`).
+Notes:
+- `repbox check` returning non-zero is expected if legacy tool paths are missing on your machine.
+- The new CLI currently provides Milestone A scaffold behavior while migration continues.
+
+## Project documentation map
+- Changelog: `Changelog.md`
+- Release workflow: `RELEASING.md`
+- Release notes templates: `RELEASE_NOTES_TEMPLATES.md`
+- v0.3.0 implementation spec: `IMPLEMENTATION_SPEC_V0.3.0.md`
+- GitHub Projects playbook: `GITHUB_PROJECT_PLAYBOOK.md`
+
+## Versioning model
+- Semantic Versioning (`MAJOR.MINOR.PATCH`).
+- `0.x.y` is used while architecture and interfaces are still stabilizing.
+- `1.0.0` will be cut when CLI behavior and configuration schema are declared stable.
+
+## Development workflow
+1. Create a focused branch per task (`feat/*`, `fix/*`, `docs/*`, `test/*`).
+2. Open a pull request into `master`.
+3. Update `Changelog.md` (`Unreleased`) for user-visible changes.
+4. Merge only when local validation and docs updates are complete.
 
 ## v0.3.0 Milestone A scaffold
 - New package scaffold under `src/repbox/`.
@@ -30,17 +43,9 @@ Suggested release usage:
 - Legacy tool-path compatibility loader for `repbox_config.txt`.
 - Initial adapter and workflow-engine stubs for phased migration.
 
-Quick start (from repository root):
-1. Optional editable install: `python -m pip install -e .`
-2. `PYTHONPATH=src python -m repbox version` (or `repbox version` if installed)
-3. `PYTHONPATH=src python -m repbox check --legacy-config repbox_config.txt`
-4. `PYTHONPATH=src python -m repbox run --input <genome.fa> --out <output_dir> --threads 4`
-
-## Quick first release plan
-1. Confirm this repository state builds/runs for your baseline test input.
-2. Review and update `Changelog.md` `0.1.0` notes if needed.
-3. Create and push annotated tag: `git tag -a v0.1.0 -m "First formal release" && git push origin v0.1.0`.
-4. Publish a GitHub Release using `v0.1.0` and changelog notes.
+## Legacy dependency installation reference
+The remaining sections below document the original dependency setup used for the thesis-era pipeline.
+They are preserved for reproducibility and migration support.
 
 # Create Home directory for repbox
 ```
