@@ -19,7 +19,13 @@ build/
 dist/
 
 .venv/
+.venv-*/
 venv/
 
 .vscode/
 .idea/
+
+# Experiment artifacts
+experiments/**/outputs/
+experiments/**/tmp/
+experiments/**/.mlruns/
