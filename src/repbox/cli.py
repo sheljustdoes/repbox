@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import argparse
-import os
 from pathlib import Path
 
 from . import __version__
-from .adapters import RepeatMaskerAdapter, RepeatModelerAdapter, default_adapters
+from .adapters import AdapterCheckResult, RepeatMaskerAdapter, RepeatModelerAdapter, default_adapters
 from .config import build_app_config
 from .logging import setup_logging
 
@@ -50,6 +49,36 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _tool_status(result: AdapterCheckResult) -> str:
+    if not result.exists:
+        return "MISSING"
+    if not result.is_executable:
+        return "BROKEN"
+    if result.compatibility_mode == "unsupported":
+        return "BROKEN"
+    return "OK"
+
+
+def _log_tool_diagnostics(logger, results: list[AdapterCheckResult], level: str = "warning") -> None:
+    failing = [result for result in results if _tool_status(result) != "OK"]
+    if not failing:
+        return
+
+    log_fn = logger.warning if level == "warning" else logger.error
+    names = ", ".join(result.name for result in failing)
+    log_fn("Tool diagnostics: %d failing tool(s): %s", len(failing), names)
+    for result in failing:
+        status = _tool_status(result)
+        log_fn(
+            "  %s [%s] path=%s",
+            result.name,
+            status,
+            result.configured_path or "<not configured>",
+        )
+        if result.hint:
+            log_fn("    hint: %s", result.hint)
+
+
 def _cmd_run(args: argparse.Namespace) -> int:
     logger = setup_logging(args.log_level)
     config = build_app_config(
@@ -72,30 +101,20 @@ def _cmd_run(args: argparse.Namespace) -> int:
     logger.info("Threads: %d", args.threads)
 
     adapter = RepeatModelerAdapter()
-    check_result = adapter.check_installation(config.tools)
-    if not check_result.exists:
-        logger.error(
-            "RepeatModeler not available at configured path: %s",
-            check_result.configured_path or "<not configured>",
-        )
-        logger.error(check_result.hint or "Update 'RepeatModeler' in legacy config.")
-        logger.error("Update 'RepeatModeler' in %s", args.legacy_config)
-        return 1
-
-    if not check_result.is_executable:
-        logger.error("RepeatModeler path is not executable: %s", check_result.configured_path)
-        logger.error("Fix executable permissions or update 'RepeatModeler' in %s", args.legacy_config)
-        return 1
-
-    build_database = config.tools.get("BuildDatabase", "")
-    if not build_database:
-        logger.error("BuildDatabase is not configured in %s", args.legacy_config)
-        return 1
-    if not Path(build_database).exists():
-        logger.error("BuildDatabase path does not exist: %s", build_database)
-        return 1
-    if not os.access(build_database, os.X_OK):
-        logger.error("BuildDatabase path is not executable: %s", build_database)
+    repeatmodeler_result = adapter.check_installation(config.tools)
+    build_database_result = next(
+        item for item in default_adapters() if item.name == "BuildDatabase"
+    ).check_installation(config.tools)
+    required_results = [repeatmodeler_result, build_database_result]
+    required_failing = [
+        result
+        for result in required_results
+        if (not result.exists) or (not result.is_executable)
+    ]
+    if required_failing:
+        logger.error("Run prerequisites failed. Fix required tool configuration before retrying.")
+        _log_tool_diagnostics(logger, required_results, level="error")
+        logger.error("Config file: %s", args.legacy_config)
         return 1
 
     try:
@@ -187,13 +206,7 @@ def _cmd_check(args: argparse.Namespace) -> int:
     logger.info("Checking configured tools from: %s", args.legacy_config)
     missing_or_broken = 0
     for result in results:
-        status = "OK"
-        if not result.exists:
-            status = "MISSING"
-        elif not result.is_executable:
-            status = "BROKEN"
-        elif result.compatibility_mode == "unsupported":
-            status = "BROKEN"
+        status = _tool_status(result)
 
         if status != "OK":
             missing_or_broken += 1
@@ -246,12 +259,21 @@ def _cmd_smoke(args: argparse.Namespace) -> int:
         f"output={output_path}",
         f"tools_total={len(results)}",
         f"tools_failing={len(failing)}",
+        f"failing_tools={','.join(result.name for result in failing) if failing else '-'}",
     ]
+
+    for result in failing:
+        report_lines.append(f"{result.name}.status={_tool_status(result)}")
+        report_lines.append(f"{result.name}.path={result.configured_path or '<not configured>'}")
+        if result.hint:
+            report_lines.append(f"{result.name}.hint={result.hint}")
+
     report_path.write_text("\n".join(report_lines) + "\n", encoding="utf-8")
     logger.info("Smoke report written: %s", report_path)
 
     if failing:
         logger.warning("Smoke check found %d tool issue(s).", len(failing))
+        _log_tool_diagnostics(logger, results, level="warning")
         return 1
 
     logger.info("Smoke check passed.")

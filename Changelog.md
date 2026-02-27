@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 - `repbox run` now executes the RepeatModeler adapter path (Milestone B foundation behavior).
 - `repbox run` now performs an optional RepeatMasker step after successful RepeatModeler execution when configured.
+- `repbox run` and `repbox smoke` now emit actionable tool diagnostics (failing tool names, paths, and hints).
 
 ### Planned
 - Environment and dependency setup improvements.
