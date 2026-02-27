@@ -78,6 +78,34 @@ class CliTests(unittest.TestCase):
             )
         self.assertEqual(rc, 1)
 
+    def test_run_logs_prerequisite_diagnostics_when_builddatabase_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            input_fa = tmp / "genome.fa"
+            input_fa.write_text(">x\nACGT\n", encoding="utf-8")
+            rm = tmp / "RepeatModeler"
+            _make_executable(rm)
+            config_path = tmp / "repbox_config.txt"
+            _write_legacy_config(config_path, {"RepeatModeler": str(rm)})
+
+            with self.assertLogs("repbox", level="ERROR") as logs:
+                rc = main(
+                    [
+                        "run",
+                        "--input",
+                        str(input_fa),
+                        "--out",
+                        str(tmp / "out"),
+                        "--legacy-config",
+                        str(config_path),
+                    ]
+                )
+
+        self.assertEqual(rc, 1)
+        combined = "\n".join(logs.output)
+        self.assertIn("Run prerequisites failed", combined)
+        self.assertIn("BuildDatabase [MISSING]", combined)
+
     def test_run_propagates_repeatmodeler_failure(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
@@ -174,8 +202,6 @@ class CliTests(unittest.TestCase):
                 )
         self.assertEqual(rc, 0)
 
-        self.assertEqual(rc, 0)
-
     def test_smoke_fails_when_input_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
@@ -241,6 +267,33 @@ class CliTests(unittest.TestCase):
             report = report_path.read_text(encoding="utf-8")
             self.assertIn("tools_total=8", report)
             self.assertIn("tools_failing=0", report)
+
+    def test_smoke_writes_failing_tool_details_in_report(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            input_fa = tmp / "genome.fa"
+            input_fa.write_text(">x\nACGT\n", encoding="utf-8")
+            config_path = tmp / "repbox_config.txt"
+            _write_legacy_config(config_path, {})
+
+            out_dir = tmp / "out"
+            rc = main(
+                [
+                    "smoke",
+                    "--input",
+                    str(input_fa),
+                    "--out",
+                    str(out_dir),
+                    "--legacy-config",
+                    str(config_path),
+                ]
+            )
+
+            self.assertEqual(rc, 1)
+            report = (out_dir / "smoke_report.txt").read_text(encoding="utf-8")
+            self.assertIn("failing_tools=", report)
+            self.assertIn("RepeatModeler.status=MISSING", report)
+            self.assertIn("BuildDatabase.status=MISSING", report)
 
 
 if __name__ == "__main__":
