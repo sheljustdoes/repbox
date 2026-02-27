@@ -425,6 +425,19 @@ class CliTests(unittest.TestCase):
         self.assertEqual(payload["error"], "unsupported_schema")
         self.assertEqual(payload["schema_version"], "99")
 
+    def test_smoke_report_json_malformed_error_output(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "smoke_report.txt"
+            report_path.write_text("input=/tmp/in.fa\n", encoding="utf-8")
+
+            stream = io.StringIO()
+            with redirect_stdout(stream):
+                rc = main(["smoke-report", "--report", str(report_path), "--json"])
+
+        self.assertEqual(rc, 1)
+        payload = json.loads(stream.getvalue().strip())
+        self.assertEqual(payload["error"], "malformed")
+
 
 if __name__ == "__main__":
     unittest.main()

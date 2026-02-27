@@ -310,48 +310,40 @@ def _parse_smoke_report(report_path: Path) -> dict[str, str]:
     return parsed
 
 
+def _emit_smoke_report_json_error(report_path: Path, error: str, schema_version: str | None = None) -> None:
+    payload: dict[str, str] = {
+        "report": str(report_path),
+        "error": error,
+    }
+    if schema_version is not None:
+        payload["schema_version"] = schema_version
+    print(json.dumps(payload))
+
+
 def _cmd_smoke_report(args: argparse.Namespace) -> int:
     logger = setup_logging(args.log_level)
     report_path = Path(args.report)
 
     if not report_path.exists():
         if args.json:
-            print(
-                json.dumps(
-                    {
-                        "report": str(report_path),
-                        "error": "not_found",
-                    }
-                )
-            )
+            _emit_smoke_report_json_error(report_path, error="not_found")
         logger.error("Smoke report not found: %s", report_path)
         return 2
 
     data = _parse_smoke_report(report_path)
     if "tools_total" not in data or "tools_failing" not in data:
         if args.json:
-            print(
-                json.dumps(
-                    {
-                        "report": str(report_path),
-                        "error": "malformed",
-                    }
-                )
-            )
+            _emit_smoke_report_json_error(report_path, error="malformed")
         logger.error("Smoke report is malformed: missing required fields")
         return 1
 
     schema_version = data.get("schema_version", "0")
     if schema_version not in {"0", SMOKE_REPORT_SCHEMA_VERSION}:
         if args.json:
-            print(
-                json.dumps(
-                    {
-                        "report": str(report_path),
-                        "error": "unsupported_schema",
-                        "schema_version": schema_version,
-                    }
-                )
+            _emit_smoke_report_json_error(
+                report_path,
+                error="unsupported_schema",
+                schema_version=schema_version,
             )
         logger.error("Smoke report schema version is unsupported: %s", schema_version)
         return 1
