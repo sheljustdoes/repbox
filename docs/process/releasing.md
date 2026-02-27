@@ -1,6 +1,6 @@
 # Releasing RepBox
 
-This document defines a lightweight release workflow for this repository.
+This document defines the release workflow and versioning policy for this repository.
 
 ## Versioning policy
 RepBox uses Semantic Versioning:
@@ -8,7 +8,10 @@ RepBox uses Semantic Versioning:
 - `MINOR`: backward-compatible features/improvements.
 - `PATCH`: backward-compatible fixes and small corrections.
 
-Until workflow and configuration are stabilized, stay in the `0.x.y` range.
+Historical note:
+- Early release intent used `0.x` framing for modernization work.
+- Published release history now includes `v1.x` transition tags and `v2.0.0` as the stable platform reset baseline.
+- Do not rewrite published tags; keep narrative consistency in release notes and changelog entries.
 
 ## Release checklist
 
@@ -40,5 +43,5 @@ git push origin vX.Y.Z
 - Re-open `Changelog.md` with a fresh `## [Unreleased]` section if needed.
 - Continue logging all user-visible changes under `Unreleased`.
 
-## First historical release recommendation
-Use `v0.1.0` as the first formal tag to represent the current thesis-era pipeline baseline.
+## Historical labeling guidance
+When referring to historical baseline work in release notes, describe semantic intent in text rather than renaming published tags.

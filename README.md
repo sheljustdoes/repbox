@@ -1,12 +1,12 @@
 # RepBox
 
-RepBox is a transposable element discovery and annotation workflow originally created during PhD thesis research and now actively modernized as a Python-first CLI platform.
+RepBox is a Python-first CLI platform for transposable element discovery and annotation, evolved from the original PhD thesis-era workflow.
 
 ## Current status
-- Modernized CLI scaffold is active under `src/repbox/`.
+- Modernized CLI implementation is active under `src/repbox/`.
 - Current commands: `run`, `check`, `smoke`, `smoke-report`, `version`.
 - Adapter-based integration is in place for RepeatModeler/RepeatMasker paths.
-- Release target is `v2.0.0` as a stable platform baseline.
+- Current stable baseline is `v2.0.0`.
 
 ## Quick start
 
@@ -28,7 +28,7 @@ Notes:
 
 - `repbox version`: print package version.
 - `repbox check --legacy-config <path>`: validate configured external tools.
-- `repbox run --input <fa> --out <dir> [--threads N] [--engine ncbi]`: run scaffolded pipeline path.
+- `repbox run --input <fa> --out <dir> [--threads N] [--engine ncbi]`: run the current adapter-based pipeline path.
 - `repbox smoke --input <fa> --out <dir>`: write `smoke_report.txt` with tool diagnostics.
 - `repbox smoke-report --report <path> [--json]`: summarize or parse smoke reports.
 

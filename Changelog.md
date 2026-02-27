@@ -14,8 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [2.0.0] - 2026-02-27
 
 ### Added
-- Python package scaffold under `src/repbox/` for v0.3.0 Milestone A.
-- New CLI scaffold with `run`, `check`, and `version` commands.
+- Python package foundation under `src/repbox/` for the modern CLI baseline.
+- New CLI command surface with `run`, `check`, and `version` commands.
 - New CLI `smoke` command for lightweight environment/input validation and report output.
 - New CLI `smoke-report` command to summarize and evaluate `smoke_report.txt` files.
 - New legacy setup reference doc: `docs/legacy/thesis_environment_setup.md`.
@@ -32,8 +32,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `repbox smoke-report` now supports `--json` output for machine-readable summaries.
 - `repbox smoke` now writes `schema_version=1`, and `repbox smoke-report` validates schema compatibility.
 - Version metadata now targets stable `2.0.0`.
-- README versioning and command coverage notes now reflect current scaffold state.
+- README versioning and command coverage notes now reflect the current platform state.
 - README was overhauled for modern onboarding, CLI usage, and research roadmap clarity.
+
+### Notes
+- `2.0.0` is the stable platform-reset baseline for current development.
+- Prior `0.x` entries are retained as historical modernization intent references.
 
 ## [0.2.0] - 2026-02-26
 

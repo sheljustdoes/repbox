@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "repbox"
 version = "2.0.0"
-description = "RepBox Python-first pipeline scaffold"
+description = "Python-first CLI platform for transposable element discovery and annotation"
 requires-python = ">=3.9"
 readme = "README.md"
 
