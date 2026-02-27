@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 
 from . import __version__
-from .adapters import default_adapters
+from .adapters import RepeatModelerAdapter, default_adapters
 from .config import build_app_config
 from .logging import setup_logging
 
@@ -19,6 +19,12 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--input", required=True, help="Input genome FASTA")
     run_parser.add_argument("--out", required=True, help="Output directory")
     run_parser.add_argument("--threads", type=int, default=1, help="Worker threads")
+    run_parser.add_argument(
+        "--legacy-config",
+        default="repbox_config.txt",
+        help="Path to legacy RepBox config file",
+    )
+    run_parser.add_argument("--engine", default="ncbi", help="Search engine for RepeatModeler")
 
     check_parser = subparsers.add_parser("check", help="Check configured tool paths")
     check_parser.add_argument(
@@ -32,6 +38,11 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def _cmd_run(args: argparse.Namespace) -> int:
     logger = setup_logging(args.log_level)
+    config = build_app_config(
+        legacy_config_path=args.legacy_config,
+        threads=args.threads,
+        output_dir=args.out,
+    )
     input_path = Path(args.input)
     output_path = Path(args.out)
 
@@ -41,11 +52,54 @@ def _cmd_run(args: argparse.Namespace) -> int:
 
     output_path.mkdir(parents=True, exist_ok=True)
 
-    logger.info("Milestone A scaffold run")
+    logger.info("Milestone B run path: RepeatModeler adapter")
     logger.info("Input: %s", input_path)
     logger.info("Output: %s", output_path)
     logger.info("Threads: %d", args.threads)
-    logger.info("No legacy pipeline behavior has been executed in this scaffold command.")
+
+    adapter = RepeatModelerAdapter()
+    check_result = adapter.check_installation(config.tools)
+    if not check_result.exists:
+        logger.error(
+            "RepeatModeler not available at configured path: %s",
+            check_result.configured_path or "<not configured>",
+        )
+        logger.error("Update 'RepeatModeler' in %s", args.legacy_config)
+        return 1
+
+    if not config.tools.get("BuildDatabase"):
+        logger.error("BuildDatabase is not configured in %s", args.legacy_config)
+        return 1
+
+    try:
+        run_result = adapter.run_pipeline(
+            tools=config.tools,
+            input_fasta=input_path,
+            output_dir=output_path,
+            threads=args.threads,
+            engine=args.engine,
+            timeout_seconds=float(config.runtime.timeout_seconds),
+        )
+    except ValueError as exc:
+        logger.error(str(exc))
+        return 1
+    except Exception as exc:
+        logger.error("RepeatModeler execution failed: %s", exc)
+        return 1
+
+    if run_result.build_database.returncode != 0:
+        logger.error("BuildDatabase failed (exit=%d)", run_result.build_database.returncode)
+        if run_result.build_database.stderr:
+            logger.error(run_result.build_database.stderr.strip())
+        return run_result.build_database.returncode
+
+    if run_result.repeatmodeler.returncode != 0:
+        logger.error("RepeatModeler failed (exit=%d)", run_result.repeatmodeler.returncode)
+        if run_result.repeatmodeler.stderr:
+            logger.error(run_result.repeatmodeler.stderr.strip())
+        return run_result.repeatmodeler.returncode
+
+    logger.info("RepeatModeler pipeline step completed successfully.")
     return 0
 
 
