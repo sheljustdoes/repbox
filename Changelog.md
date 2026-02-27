@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `repbox run` now performs an optional RepeatMasker step after successful RepeatModeler execution when configured.
 - `repbox run` and `repbox smoke` now emit actionable tool diagnostics (failing tool names, paths, and hints).
 - `repbox smoke-report` now supports `--json` output for machine-readable summaries.
+- `repbox smoke` now writes `schema_version=1`, and `repbox smoke-report` validates schema compatibility.
 
 ### Planned
 - Environment and dependency setup improvements.

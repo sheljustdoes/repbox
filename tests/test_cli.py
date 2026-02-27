@@ -268,6 +268,7 @@ class CliTests(unittest.TestCase):
             report_path = out_dir / "smoke_report.txt"
             self.assertTrue(report_path.exists())
             report = report_path.read_text(encoding="utf-8")
+            self.assertIn("schema_version=1", report)
             self.assertIn("tools_total=8", report)
             self.assertIn("tools_failing=0", report)
 
@@ -294,6 +295,7 @@ class CliTests(unittest.TestCase):
 
             self.assertEqual(rc, 1)
             report = (out_dir / "smoke_report.txt").read_text(encoding="utf-8")
+            self.assertIn("schema_version=1", report)
             self.assertIn("failing_tools=", report)
             self.assertIn("RepeatModeler.status=MISSING", report)
             self.assertIn("BuildDatabase.status=MISSING", report)
@@ -365,6 +367,7 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(rc, 0)
         payload = json.loads(stream.getvalue().strip())
+        self.assertEqual(payload["schema_version"], "0")
         self.assertEqual(payload["status"], "pass")
         self.assertEqual(payload["tools_failing"], 0)
         self.assertEqual(payload["failing_tools"], [])
@@ -392,9 +395,35 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(rc, 1)
         payload = json.loads(stream.getvalue().strip())
+        self.assertEqual(payload["schema_version"], "0")
         self.assertEqual(payload["status"], "fail")
         self.assertEqual(payload["tools_failing"], 2)
         self.assertEqual(payload["failing_tools"], ["RepeatModeler", "BuildDatabase"])
+
+    def test_smoke_report_rejects_unsupported_schema(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "smoke_report.txt"
+            report_path.write_text(
+                "\n".join(
+                    [
+                        "schema_version=99",
+                        "tools_total=8",
+                        "tools_failing=0",
+                        "failing_tools=-",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            stream = io.StringIO()
+            with redirect_stdout(stream):
+                rc = main(["smoke-report", "--report", str(report_path), "--json"])
+
+        self.assertEqual(rc, 1)
+        payload = json.loads(stream.getvalue().strip())
+        self.assertEqual(payload["error"], "unsupported_schema")
+        self.assertEqual(payload["schema_version"], "99")
 
 
 if __name__ == "__main__":

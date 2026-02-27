@@ -10,6 +10,9 @@ from .config import build_app_config
 from .logging import setup_logging
 
 
+SMOKE_REPORT_SCHEMA_VERSION = "1"
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="repbox", description="RepBox Python CLI scaffold")
     parser.add_argument("--log-level", default="INFO", help="Logging level")
@@ -271,6 +274,7 @@ def _cmd_smoke(args: argparse.Namespace) -> int:
 
     report_path = output_path / "smoke_report.txt"
     report_lines = [
+        f"schema_version={SMOKE_REPORT_SCHEMA_VERSION}",
         f"input={input_path}",
         f"output={output_path}",
         f"tools_total={len(results)}",
@@ -337,6 +341,21 @@ def _cmd_smoke_report(args: argparse.Namespace) -> int:
         logger.error("Smoke report is malformed: missing required fields")
         return 1
 
+    schema_version = data.get("schema_version", "0")
+    if schema_version not in {"0", SMOKE_REPORT_SCHEMA_VERSION}:
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "report": str(report_path),
+                        "error": "unsupported_schema",
+                        "schema_version": schema_version,
+                    }
+                )
+            )
+        logger.error("Smoke report schema version is unsupported: %s", schema_version)
+        return 1
+
     tools_total = data.get("tools_total", "?")
     tools_failing = data.get("tools_failing", "?")
     failing_tools = data.get("failing_tools", "-")
@@ -347,6 +366,7 @@ def _cmd_smoke_report(args: argparse.Namespace) -> int:
             json.dumps(
                 {
                     "report": str(report_path),
+                    "schema_version": schema_version,
                     "tools_total": int(tools_total) if tools_total.isdigit() else tools_total,
                     "tools_failing": failing_count,
                     "failing_tools": [] if failing_tools == "-" else failing_tools.split(","),
@@ -357,6 +377,7 @@ def _cmd_smoke_report(args: argparse.Namespace) -> int:
 
     logger.info("Smoke report summary")
     logger.info("  report: %s", report_path)
+    logger.info("  schema_version: %s", schema_version)
     logger.info("  tools_total: %s", tools_total)
     logger.info("  tools_failing: %s", tools_failing)
     logger.info("  failing_tools: %s", failing_tools)
