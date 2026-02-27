@@ -51,7 +51,7 @@ Notes:
 - Release workflow: `docs/process/releasing.md`
 - Release notes templates: `docs/process/release_notes_templates.md`
 - GitHub project playbook: `docs/process/github_project_playbook.md`
-- Legacy implementation spec: `IMPLEMENTATION_SPEC_V0.3.0.md`
+- Legacy implementation spec: `docs/legacy/IMPLEMENTATION_SPEC_V0.3.0.md`
 - Legacy thesis environment setup: `docs/legacy/thesis_environment_setup.md`
 
 ## Research roadmap
