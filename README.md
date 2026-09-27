@@ -2,6 +2,8 @@
 
 RepBox is a Python-first CLI platform for transposable element discovery and annotation, evolved from the original PhD thesis-era workflow.
 
+**Published:** Burkes-Patton, Cooper & Schlueter, "RepBox: a toolbox for the identification of repetitive elements", *BMC Bioinformatics* 24, 317 (2023). [doi:10.1186/s12859-023-05419-5](https://doi.org/10.1186/s12859-023-05419-5)
+
 ## Current status
 - Modernized CLI implementation is active under `src/repbox/`.
 - Current commands: `run`, `check`, `smoke`, `smoke-report`, `version`.
