@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.png" alt="repbox." width="100%"></p>
+
 # RepBox
 
 RepBox is a Python-first CLI platform for transposable element discovery and annotation, evolved from the original PhD thesis-era workflow.
